@@ -1,0 +1,23 @@
+# Binaries
+target/
+**/*.rs.bak
+*.exe
+
+# Config files
+healthpulse.json
+healthpulse.yaml
+
+# Test artifacts
+*.profraw
+*.profdata
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
