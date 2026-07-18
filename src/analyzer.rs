@@ -120,8 +120,15 @@ fn should_skip_dir(path: &str) -> bool {
 
 fn is_test_file(entry: &walkdir::DirEntry) -> bool {
     let path = entry.path();
-    let file_name = path.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
-    let parent_dir = path.parent().and_then(|p| p.file_name()).map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
+    let file_name = path
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let parent_dir = path
+        .parent()
+        .and_then(|p| p.file_name())
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
 
     // Check if the file name itself matches test patterns
     let is_test_name = file_name.contains("_test")
@@ -179,46 +186,46 @@ fn analyze_file(
 
     // Check function lengths (Go-specific)
     for (i, line) in lines.iter().enumerate() {
-        if line.trim().starts_with("func ") {
-            if let Some(end) = find_function_end(&lines[i..]) {
-                let func_length = end + 1;
-                if func_length > config.max_function_length as usize && !is_test {
-                    issues.push(Issue {
-                        file: path.to_string_lossy().to_string(),
-                        severity: Severity::Info,
-                        category: Category::Length,
-                        message: format!(
-                            "Function at line {} is {} lines (max {})",
-                            i + 1,
-                            func_length,
-                            config.max_function_length
-                        ),
-                        line: Some(i + 1),
-                    });
-                }
+        if line.trim().starts_with("func ")
+            && let Some(end) = find_function_end(&lines[i..])
+        {
+            let func_length = end + 1;
+            if func_length > config.max_function_length as usize && !is_test {
+                issues.push(Issue {
+                    file: path.to_string_lossy().to_string(),
+                    severity: Severity::Info,
+                    category: Category::Length,
+                    message: format!(
+                        "Function at line {} is {} lines (max {})",
+                        i + 1,
+                        func_length,
+                        config.max_function_length
+                    ),
+                    line: Some(i + 1),
+                });
             }
         }
     }
 
     // Also check Python function definitions
     for (i, line) in lines.iter().enumerate() {
-        if line.trim().starts_with("def ") {
-            if let Some(end) = find_python_function_end(&lines[i..]) {
-                let func_length = end + 1;
-                if func_length > config.max_function_length as usize && !is_test {
-                    issues.push(Issue {
-                        file: path.to_string_lossy().to_string(),
-                        severity: Severity::Info,
-                        category: Category::Length,
-                        message: format!(
-                            "Function at line {} is {} lines (max {})",
-                            i + 1,
-                            func_length,
-                            config.max_function_length
-                        ),
-                        line: Some(i + 1),
-                    });
-                }
+        if line.trim().starts_with("def ")
+            && let Some(end) = find_python_function_end(&lines[i..])
+        {
+            let func_length = end + 1;
+            if func_length > config.max_function_length as usize && !is_test {
+                issues.push(Issue {
+                    file: path.to_string_lossy().to_string(),
+                    severity: Severity::Info,
+                    category: Category::Length,
+                    message: format!(
+                        "Function at line {} is {} lines (max {})",
+                        i + 1,
+                        func_length,
+                        config.max_function_length
+                    ),
+                    line: Some(i + 1),
+                });
             }
         }
     }
@@ -325,11 +332,7 @@ fn find_python_function_end(lines: &[&str]) -> Option<usize> {
     Some(lines.len() - 1)
 }
 
-fn check_test_ratio(
-    entries: &[walkdir::DirEntry],
-    config: &Config,
-    result: &mut AnalysisResult,
-) {
+fn check_test_ratio(entries: &[walkdir::DirEntry], config: &Config, result: &mut AnalysisResult) {
     let total_files: usize = entries.iter().filter(|e| !is_test_file(e)).count();
     let test_files: usize = entries.iter().filter(|e| is_test_file(e)).count();
 

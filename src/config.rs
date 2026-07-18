@@ -27,8 +27,8 @@ impl Default for Config {
 
 impl Config {
     pub fn load(&mut self, path: &str) -> Result<(), String> {
-        let content = fs::read_to_string(path)
-            .map_err(|e| format!("Failed to read config file: {e}"))?;
+        let content =
+            fs::read_to_string(path).map_err(|e| format!("Failed to read config file: {e}"))?;
 
         let cfg: Config = serde_json::from_str(&content)
             .map_err(|e| format!("Failed to parse config file: {e}"))?;

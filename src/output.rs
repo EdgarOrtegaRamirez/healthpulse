@@ -50,45 +50,48 @@ impl Output {
             output.push_str("  ✅ No issues found! Great code health!\n\n");
         } else {
             // Group issues by category
-            let mut complexity_issues: Vec<_> = result.issues.iter()
+            let complexity_issues: Vec<_> = result
+                .issues
+                .iter()
                 .filter(|i| i.category == Category::Complexity)
                 .collect();
-            let mut length_issues: Vec<_> = result.issues.iter()
+            let length_issues: Vec<_> = result
+                .issues
+                .iter()
                 .filter(|i| i.category == Category::Length)
                 .collect();
-            let mut test_issues: Vec<_> = result.issues.iter()
+            let test_issues: Vec<_> = result
+                .issues
+                .iter()
                 .filter(|i| i.category == Category::TestCoverage)
                 .collect();
 
             if !complexity_issues.is_empty() {
-                output.push_str(&format!(
-                    "  📊 Complexity ({})\n",
-                    complexity_issues.len()
-                ));
+                output.push_str(&format!("  📊 Complexity ({})\n", complexity_issues.len()));
                 for issue in &complexity_issues[..complexity_issues.len().min(5)] {
-                    let line_str = issue.line.map(|l| format!(" (line {})", l)).unwrap_or_default();
+                    let line_str = issue
+                        .line
+                        .map(|l| format!(" (line {})", l))
+                        .unwrap_or_default();
                     output.push_str(&format!("    - {}{}\n", issue.message, line_str));
                 }
                 output.push('\n');
             }
 
             if !length_issues.is_empty() {
-                output.push_str(&format!(
-                    "  📏 Length ({})\n",
-                    length_issues.len()
-                ));
+                output.push_str(&format!("  📏 Length ({})\n", length_issues.len()));
                 for issue in &length_issues[..length_issues.len().min(5)] {
-                    let line_str = issue.line.map(|l| format!(" (line {})", l)).unwrap_or_default();
+                    let line_str = issue
+                        .line
+                        .map(|l| format!(" (line {})", l))
+                        .unwrap_or_default();
                     output.push_str(&format!("    - {}{}\n", issue.message, line_str));
                 }
                 output.push('\n');
             }
 
             if !test_issues.is_empty() {
-                output.push_str(&format!(
-                    "  🧪 Tests ({})\n",
-                    test_issues.len()
-                ));
+                output.push_str(&format!("  🧪 Tests ({})\n", test_issues.len()));
                 for issue in &test_issues {
                     output.push_str(&format!("    - {}\n", issue.message));
                 }
@@ -102,13 +105,10 @@ impl Output {
             "    {:<45} {:>8} {:>8}\n",
             "File", "Lines", "Complexity"
         ));
-        output.push_str(&format!(
-            "    {:─<45} {:─<8} {:─<8}\n",
-            "", "", ""
-        ));
+        output.push_str(&format!("    {:─<45} {:─<8} {:─<8}\n", "", "", ""));
 
         let mut files: Vec<_> = result.file_stats.iter().collect();
-        files.sort_by(|a, b| b.1.lines.cmp(&a.1.lines));
+        files.sort_by_key(|a| std::cmp::Reverse(a.1.lines));
 
         for (path, stats) in &files[..files.len().min(20)] {
             output.push_str(&format!(
@@ -160,32 +160,19 @@ impl Output {
         output.push_str("# Code Health Report\n\n");
 
         output.push_str("## Summary\n\n");
-        output.push_str(&format!("| Metric | Value |\n|--------|-------|\n"));
-        output.push_str(&format!(
-            "| Files scanned | {} |\n",
-            result.total_files
-        ));
-        output.push_str(&format!(
-            "| Total lines | {} |\n",
-            result.total_lines
-        ));
-        output.push_str(&format!(
-            "| Critical issues | {} |\n",
-            result.critical
-        ));
-        output.push_str(&format!(
-            "| Warnings | {} |\n",
-            result.warnings
-        ));
-        output.push_str(&format!(
-            "| Info | {} |\n",
-            result.infos
-        ));
+        output.push_str("| Metric | Value |\n|--------|-------|\n");
+        output.push_str(&format!("| Files scanned | {} |\n", result.total_files));
+        output.push_str(&format!("| Total lines | {} |\n", result.total_lines));
+        output.push_str(&format!("| Critical issues | {} |\n", result.critical));
+        output.push_str(&format!("| Warnings | {} |\n", result.warnings));
+        output.push_str(&format!("| Info | {} |\n", result.infos));
 
         if !result.issues.is_empty() {
             output.push_str("\n## Issues\n\n");
 
-            let mut complexity_issues: Vec<_> = result.issues.iter()
+            let complexity_issues: Vec<_> = result
+                .issues
+                .iter()
                 .filter(|i| i.category == Category::Complexity)
                 .collect();
             if !complexity_issues.is_empty() {
@@ -202,7 +189,9 @@ impl Output {
                 output.push('\n');
             }
 
-            let mut length_issues: Vec<_> = result.issues.iter()
+            let length_issues: Vec<_> = result
+                .issues
+                .iter()
                 .filter(|i| i.category == Category::Length)
                 .collect();
             if !length_issues.is_empty() {

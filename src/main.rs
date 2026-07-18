@@ -46,17 +46,19 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
 
-    let mut config = Config::default();
-    config.max_complexity = cli.max_complexity;
-    config.max_function_length = cli.max_function_length;
-    config.max_file_length = cli.max_file_length;
-    config.min_test_ratio = cli.min_test_ratio;
+    let mut config = Config {
+        max_complexity: cli.max_complexity,
+        max_function_length: cli.max_function_length,
+        max_file_length: cli.max_file_length,
+        min_test_ratio: cli.min_test_ratio,
+        ..Default::default()
+    };
 
-    if let Some(cfg_path) = &cli.config {
-        if let Err(e) = config.load(cfg_path) {
-            eprintln!("Error loading config: {e}");
-            std::process::exit(1);
-        }
+    if let Some(cfg_path) = &cli.config
+        && let Err(e) = config.load(cfg_path)
+    {
+        eprintln!("Error loading config: {e}");
+        std::process::exit(1);
     }
 
     for pattern in &cli.ignore {

@@ -1,6 +1,6 @@
 // Tests for the code health analyzer
 
-use healthpulse::analyzer::{analyze, Category};
+use healthpulse::analyzer::{Category, analyze};
 use healthpulse::config::Config;
 use std::env;
 use std::fs;
@@ -32,19 +32,25 @@ fn test_analyze_finds_long_file() {
     let file_path = tmp.join("big.go");
     fs::write(&file_path, content).unwrap();
 
-    let mut config = Config::default();
-    config.max_file_length = 500;
+    let config = Config {
+        max_file_length: 500,
+        ..Default::default()
+    };
 
     let result = analyze(tmp.to_str().unwrap(), &config);
 
     assert_eq!(result.total_files, 1);
-    
+
     // Debug: print all issues
     for issue in &result.issues {
         eprintln!("ISSUE: {:?} - {}", issue.category, issue.message);
     }
-    
-    assert!(result.total_issues > 0, "Expected at least 1 issue, got {}", result.total_issues);
+
+    assert!(
+        result.total_issues > 0,
+        "Expected at least 1 issue, got {}",
+        result.total_issues
+    );
 
     let has_length_issue = result
         .issues
@@ -73,8 +79,10 @@ fn test_analyze_finds_complex_file() {
     let file_path = tmp.join("complex.go");
     fs::write(&file_path, content).unwrap();
 
-    let mut config = Config::default();
-    config.max_complexity = 10;
+    let config = Config {
+        max_complexity: 10,
+        ..Default::default()
+    };
 
     let result = analyze(tmp.to_str().unwrap(), &config);
 
@@ -105,8 +113,10 @@ fn test_analyze_finds_function_too_long() {
     let file_path = tmp.join("long.go");
     fs::write(&file_path, content).unwrap();
 
-    let mut config = Config::default();
-    config.max_function_length = 50;
+    let config = Config {
+        max_function_length: 50,
+        ..Default::default()
+    };
 
     let result = analyze(tmp.to_str().unwrap(), &config);
 
@@ -116,7 +126,11 @@ fn test_analyze_finds_function_too_long() {
         .issues
         .iter()
         .any(|i| i.category == Category::Length && i.message.contains("Function at line 3"));
-    assert!(has_func_issue, "Should find a long function issue. Issues: {:?}", result.issues);
+    assert!(
+        has_func_issue,
+        "Should find a long function issue. Issues: {:?}",
+        result.issues
+    );
 }
 
 #[test]
@@ -131,8 +145,10 @@ fn test_analyze_respects_test_files() {
     let file_path = tmp.join("big_test.go");
     fs::write(&file_path, content).unwrap();
 
-    let mut config = Config::default();
-    config.max_file_length = 500;
+    let config = Config {
+        max_file_length: 500,
+        ..Default::default()
+    };
 
     let result = analyze(tmp.to_str().unwrap(), &config);
 
@@ -232,8 +248,10 @@ fn test_test_ratio_warning() {
         fs::write(tmp.join(format!("source{}.go", i)), "package main\n").unwrap();
     }
 
-    let mut config = Config::default();
-    config.min_test_ratio = 0.3;
+    let config = Config {
+        min_test_ratio: 0.3,
+        ..Default::default()
+    };
 
     let result = analyze(tmp.to_str().unwrap(), &config);
 
